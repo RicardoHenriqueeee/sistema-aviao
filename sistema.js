@@ -43,8 +43,3 @@ console.log(servicoAeronaves.recuperarAeronavePorPrefixo('PP-ABCD').toString());
 console.log(servicoPilotos.recuperarPilotoPorMatricula('P001').toString());
 console.log("=====================================================================================");
 
-// Altitudes livres
-
-
-console.log("Altitudes livres");
-console.log(servicoAerovias.listarAltitudesLivres());

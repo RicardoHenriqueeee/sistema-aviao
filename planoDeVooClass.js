@@ -1,3 +1,4 @@
+// PlanoDeVoo
 export class PlanoDeVoo {
     #id;
     #piloto;
@@ -77,6 +78,7 @@ export class PlanoDeVoo {
     }
 }
 
+
 export class ServicoPlanoDeVoo {
     #planoDeVoo;
 
@@ -111,7 +113,7 @@ export class ServicoPlanoDeVoo {
 }
 
 // Criando planos de voo
-let planoDeVoo1 = criarPlanoDeVoo(1, piloto1, aeronave1, '2024-08-18', '14:00', aerovia1, 26000);
-let planoDeVoo2 = criarPlanoDeVoo(2, piloto2, aeronave3, '2024-08-18', '15:00', aerovia1, 27000);
-let planoDeVoo3 = criarPlanoDeVoo(3, piloto3, aeronave2, '2024-08-18', '16:00', aerovia1, 28000);
+//let planoDeVoo1 = criarPlanoDeVoo(1, piloto1, aeronave1, '2024-08-18', '14:00', aerovia1, 26000);
+//let planoDeVoo2 = criarPlanoDeVoo(2, piloto2, aeronave3, '2024-08-18', '15:00', aerovia1, 27000);
+//let planoDeVoo3 = criarPlanoDeVoo(3, piloto3, aeronave2, '2024-08-18', '16:00', aerovia1, 28000);
 

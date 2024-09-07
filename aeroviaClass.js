@@ -1,5 +1,4 @@
 // --Aerovia--
-// --Aerovia--
 export class Aerovia {
     #identificador;
     #origem;
