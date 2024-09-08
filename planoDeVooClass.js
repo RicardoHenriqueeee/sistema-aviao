@@ -78,42 +78,75 @@ export class PlanoDeVoo {
     }
 }
 
+import { AeronaveParticular, AeronaveCarga, AeronavePassageiros, AeronaveComercial } from './aeronaveClass.js';
+
 
 export class ServicoPlanoDeVoo {
-    #planoDeVoo;
+    #planosDeVoo;
+    #ultimoIdPlano;  // Armazenar o último identificador gerado
 
     constructor() {
-        this.#planoDeVoo = [];
+        this.#planosDeVoo = [];
+        this.#ultimoIdPlano = 0; // Inicializa com 0, ou outro valor apropriado
     }
 
-    adicionarPlanoDeVoo(planoDeVoo) {
-        this.#planoDeVoo.push(planoDeVoo);
-    }
-    criarPlanoDeVoo(id, piloto, aeronave, data, horario, aerovia, altitude) {
-        if (!piloto.habilitacaoAtiva) {
-            console.log(`Erro: O piloto ${piloto.getNome()} (Matrícula: ${piloto.getNumeroMatricula()}) não está habilitado para voar.`);
+    // Submeter um plano de voo para aprovação
+    submeterPlanoDeVoo(piloto, aeronave, data, horario, aerovia, altitude) {
+        // Verifica se o piloto tem habilitação ativa
+        if (!piloto.getHabilitacaoAtiva()) {
+            console.log(`Plano de voo recusado: O piloto ${piloto.getNome()} não tem habilitação ativa.`);
             return null;
         }
 
-        if (!aeronave.verificarRestricoes(altitude, horario)) {
-            console.log(`Erro: A aeronave ${aeronave.Prefixo} não pode operar na altitude de ${altitude} pés ou no horário ${horario}.`);
+        // Verifica restrições de altitude e horário para diferentes tipos de aeronaves
+        if (aeronave instanceof AeronaveParticular && (altitude < 25000 || altitude > 27000)) {
+            console.log(`Plano de voo recusado: Aeronave particular ${aeronave.getPrefixo()} só pode voar entre 25.000 e 27.000 pés.`);
             return null;
         }
 
+        if (aeronave instanceof AeronavePassageiros && altitude <= 28000) {
+            console.log(`Plano de voo recusado: Aeronave de passageiros ${aeronave.getPrefixo()} só pode voar acima de 28.000 pés.`);
+            return null;
+        }
+
+        // Aeronaves de carga só podem voar entre meia noite e 6:00 da manhã
+        if (!aeronave instanceof AeronaveCarga && (horario > 0 || horario < 7)) {
+            console.log(`Plano de voo recusado: Aeronave de carga ${aeronave.getPrefixo()} só pode voar entre meia noite e 6:00 da manhã.`);
+            return null;
+        }
+
+        // Verifica se a aerovia/altitude estão livres no horário solicitado
         if (!aerovia.verificarDisponibilidade(altitude, data, horario)) {
-            console.log(`Erro: O slot na aerovia ${aerovia.identificador} não está disponível na data ${data} às ${horario} na altitude de ${altitude} pés.`);
+            console.log(`Plano de voo recusado: A aerovia ${aerovia.getIdentificador()} está ocupada na altitude ${altitude} ft no horário ${horario}.`);
             return null;
         }
 
-        let planoDeVoo = new PlanoDeVoo(id, piloto, aeronave, data, horario, aerovia, altitude);
+        // Aprova o plano de voo
+        this.#ultimoIdPlano++;
+        const novoPlano = new PlanoDeVoo(this.#ultimoIdPlano, piloto, aeronave, data, horario, aerovia, altitude);
+
+        // Marca a aerovia/altitude como ocupada no horário indicado
         aerovia.ocuparSlot(altitude, data, horario);
-        console.log(`Plano de voo ${id} criado com sucesso!`);
-        return planoDeVoo;
+
+        // Armazena o plano de voo no sistema
+        this.adicionarPlanoDeVoo(novoPlano);
+
+        console.log(`Plano de voo aprovado com o ID ${novoPlano.getId()}`);
+        return novoPlano.getId();
+    }
+
+    // Adiciona um plano de voo ao sistema
+    adicionarPlanoDeVoo(planoDeVoo) {
+        this.#planosDeVoo.push(planoDeVoo);
+    }
+
+    listarPlanoDeVoo(id) {
+        const planoEncontrado = this.#planosDeVoo.find(plano => plano.getId() === id);
+        if (planoEncontrado) {
+            console.log(planoEncontrado.toString());
+        } else {
+            console.log(`Nenhum plano de voo encontrado com o ID ${id}`);
+        }
     }
 }
-
-// Criando planos de voo
-//let planoDeVoo1 = criarPlanoDeVoo(1, piloto1, aeronave1, '2024-08-18', '14:00', aerovia1, 26000);
-//let planoDeVoo2 = criarPlanoDeVoo(2, piloto2, aeronave3, '2024-08-18', '15:00', aerovia1, 27000);
-//let planoDeVoo3 = criarPlanoDeVoo(3, piloto3, aeronave2, '2024-08-18', '16:00', aerovia1, 28000);
 

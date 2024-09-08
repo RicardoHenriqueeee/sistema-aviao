@@ -52,12 +52,29 @@ export class Aerovia {
         this.#tamanho = tamanho;
     }
 
+    // Método para verificar a disponibilidade de uma altitude em uma data e horário
+    verificarDisponibilidade(altitude, data, horario) {
+        if (!this.#slotsOcupados[data]) return true;
+        if (!this.#slotsOcupados[data][altitude]) return true;
+        return !this.#slotsOcupados[data][altitude].includes(horario);
+    }
+
+    // Método para ocupar uma altitude em um horário específico
+    ocuparSlot(altitude, data, horario) {
+        if (!this.#slotsOcupados[data]) {
+            this.#slotsOcupados[data] = {};
+        }
+        if (!this.#slotsOcupados[data][altitude]) {
+            this.#slotsOcupados[data][altitude] = [];
+        }
+        this.#slotsOcupados[data][altitude].push(horario);
+    }
+
     // Método toString para exibir as informações da aerovia
     toString() {
         return `Aerovia ${this.#identificador} (Origem: ${this.#origem}, Destino: ${this.#destino}, Tamanho: ${this.#tamanho} km)`;
     }
 }
-
 
 // --ServicoAerovias--
 export class ServicoAerovias {
@@ -79,19 +96,35 @@ export class ServicoAerovias {
         return this.#aerovias.find(aerovia => aerovia.getIdentificador() === identificador);
     }
 
-    verificarDisponibilidade(altitude, data, horario) {
-        if (!this.slotsOcupados[data]) return true;
-        if (!this.slotsOcupados[data][altitude]) return true;
-        return !this.slotsOcupados[data][altitude].includes(horario);
+    listarAeroviasEntreAeroportos(origem, destino) {
+        const aerovias = this.listarAerovias(origem, destino);
+        if (aerovias.length === 0) {
+            console.log(`Nenhuma aerovia encontrada entre ${origem} e ${destino}.`);
+        } else {
+            console.log(`Aerovias entre ${origem} e ${destino}:`);
+            aerovias.forEach(aerovia => console.log(aerovia.toString()));
+        }
     }
 
-    ocuparSlot(altitude, data, horario) {
-        if (!this.slotsOcupados[data]) {
-            this.slotsOcupados[data] = {};
+    listarAltitudesLivres(aeroviaIdentificador, data, horario) {
+        const aerovia = this.recuperarAeroviaPorIdentificador(aeroviaIdentificador);
+        if (!aerovia) {
+            console.log(`Aerovia ${aeroviaIdentificador} não encontrada.`);
+            return;
         }
-        if (!this.slotsOcupados[data][altitude]) {
-            this.slotsOcupados[data][altitude] = [];
+
+        const altitudesLivres = [];
+        for (let altitude = 25000; altitude <= 35000; altitude += 1000) {
+            if (aerovia.verificarDisponibilidade(altitude, data, horario)) {
+                altitudesLivres.push(altitude);
+            }
         }
-        this.slotsOcupados[data][altitude].push(horario);
+
+        if (altitudesLivres.length === 0) {
+            console.log(`Nenhuma altitude livre na aerovia ${aeroviaIdentificador} na data ${data} às ${horario}.`);
+        } else {
+            console.log(`Altitudes livres na aerovia ${aeroviaIdentificador} na data ${data} às ${horario}: ${altitudesLivres.join(', ')} ft`);
+        }
     }
+
 }

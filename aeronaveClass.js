@@ -71,10 +71,6 @@ export class AeronaveParticular extends Aeronave {
     toString() {
         return `${super.toString()}, Empresa Responsável: ${this.#empresaManutencao}`;
     }
-
-    verificarRestricoes(altitude, horario) {
-        return altitude >= 25000 && altitude <= 27000;
-    }
 }
 
 // --AeronaveComercial--
